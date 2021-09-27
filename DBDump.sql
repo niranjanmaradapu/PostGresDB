@@ -186,7 +186,7 @@ insert into deliveryslip(dsNumber,status,salesManID) values ('ds00003',1,(select
 drop table if exists lineitems;
 CREATE TABLE public.Lineitems (
 	dsuuid UUID references deliveryslip(uniqueID),
-	itemsku character varying(28),
+	itemsku references ProductItem(uniqueID),
 	itemprice decimal(12,2),
 	quantity integer,
 	grossvalue decimal(12,2),
@@ -366,8 +366,8 @@ drop table if exists productItem;
 
 CREATE TABLE public.productItem (
     id serial NOT NULL,
-    barcode  character varying(28) NOT NULL,
-    typecode  character varying(28),
+    barcode  character varying(28) NOT NULL,  /* need to have separate table so that population will be easier*/
+    typecode  character varying(28) 10/20,     
     defaultimage  character varying(28), 
     stock integer,
     defaultcatalogcategoryid references catalog_categories(uniqueUUID),
@@ -375,13 +375,26 @@ CREATE TABLE public.productItem (
     Title/name character varying(512),
     costprice decimal(12,2),
     listprice decimal(12,2),
-    UOM character varying(28),,
+    UOM character varying(28),
     storeuuid references stores(uniqueUUID),
     domaindatauuid references domaindata(uniqueID),
     uniqueid UUID default uuid_generate_v4() primary key,
     creationdate timestamp default current_timestamp,
     lastmodified timestamp default current_timestamp
 );
+
+
+1,b001,10,img001.jpg,101,def001,1,'shirt ramaraj',900,1200,'piece','s001',texttile_0001,uni001,sysdate,sysdate
+2,b001,20,img001.jpg,101,def001,1,'shirt ramaraj',900,1200,'piece','s001',texttile_0001,uni002,sysdate,sysdate
+
+
+productvariation
+
+uni001 uni002
+uni001 uni003
+uni001 uni004
+
+
 
 drop table if exists productItem_av;
 CREATE TABLE public.productItem_av (

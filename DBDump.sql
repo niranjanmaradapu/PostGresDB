@@ -1,3 +1,10 @@
+ createdb -O postgres -U postgres -W -h DESKTOP-0QENP50 -p 5432 KMDEMO
+
+ CREATE DATABASE KMDEMO WITH ENCODING 'UTF8' LC_COLLATE='English_India' LC_CTYPE='English_India';
+ psql -U postgres -W -h psy1-db-psql-1.intershop.com.au -p 5432 -f 01-user-setup.sql SAASDEMO
+ psql -U bunker -W -h psy1-db-psql-1.intershop.com.au -p 5432 -f 02-create-user-objects.sql SAASDEMO
+
+
 --CREATE database KLMPOSDB tablespace pg_Default;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TYPE gender_datatype AS ENUM ('F', 'M','T');
@@ -26,6 +33,8 @@ insert into statedefinition(stategroup,stateid,statename) values('DeliverySlipSt
 insert into statedefinition(stategroup,stateid,statename) values('DeliverySlipStatus',3,'noorder_created');
 insert into statedefinition(stategroup,stateid,statename) values('UserGroupStatus',1,'active');
 insert into statedefinition(stategroup,stateid,statename) values('UserGroupStatus',2,'inactive');    
+insert into statedefinition(stategroup,stateid,statename) values('CategoryStatus',1,'active');
+insert into statedefinition(stategroup,stateid,statename) values('CategoryStatus',2,'inactive'); 
 
 drop table if exists public.domaindata;
 
@@ -41,9 +50,9 @@ insert into domaindata(domainname,description) values('textile','kalamandir text
 insert into domaindata(domainname,description) values('retail','kalamandir retail division');
 insert into domaindata(domainname,description) values('EE','kalamandir Electrical Electronics organization');
 
-anonymous / application
+--anonymous / application
 
-customer(buyer)/user(KM employee)
+--customer(buyer)/user(KM employee)
 
 
 drop table if exists public.userType;
@@ -65,6 +74,9 @@ insert into userType(typeID,typeDescription) values(7,'security');
 
 
 
+insert into userType(typeID,typeDescription) values(17,'customised');
+
+
 drop table if exists public.userData;
 CREATE TABLE public.userData (
 	userName character varying(28),
@@ -80,6 +92,11 @@ CREATE TABLE public.userData (
     creationdate date default current_timestamp,
     lastmodified date default current_timestamp
 );
+
+1000
+
+300 retail 290(0) reatail customer 10 retail users
+
 
 insert into public.userdata(userName,password,status,phonenumber,gender,type,dateofbirth,email,domaindatauuid)
   values ('bhaskara','ilovedatabase',1,'55555555','M',6,
@@ -190,6 +207,25 @@ values
 
 
 
+drop table if exists order;
+
+CREATE TABLE public.order (
+    orderNumber character varying(28),
+    status integer,
+    dsUUID UUID references deliveryslip(uniqueID),
+    grossvalue decimal(12,2),
+    taxcode character(28),
+    taxvalue decimal(12,2),
+    netvalue decimal(12,2),
+    storeUUID references Stores(uniqueID)
+    customerid references userdata(uniqueID)
+    domaindatauuid references domaindata(uniqueID)
+    uniqueID UUID default uuid_generate_v4() primary key,
+    creationdate timestamp default current_timestamp,
+    lastmodified timestamp default current_timestamp
+);
+
+
 drop table if exists stores;
 CREATE TABLE public.stores (
     storeName character varying(28),
@@ -282,55 +318,86 @@ CREATE TABLE public.giftVoucher (
     GiftVoucherNumber integer,
     Description character varying(28),
     ExpiryDate timestamp default current_timestamp,,
-    TotalGVAmount decimal(12,2),,
-    UsedAmount decimal(12,2),,
+    TotalGVAmount decimal(12,2),
+    UsedAmount decimal(12,2),
     uniqueid UUID default uuid_generate_v4() primary key,
     creationdate timestamp default current_timestamp,
     lastmodified timestamp default current_timestamp
 );
 
 
-/*
-itemdivisions
-(id serial,
-Name character varying(28),
-Description character varying(28),
-parentID UUID references itemdivisions(UUID),
-uniqueid UUID default uuid_generate_v4() primary key,
-    creationdate timestamp default current_timestamp,
-    lastmodified timestamp default current_timestamp
- )
-
-
-1,'Ladies','ladies main division',NULL,u0001201,sysdate,sysdate
-2, 'Pattu','ladies subsection costly',u0001201,u0001202,sysdate,sysdate
-
-
-drop table if exists ProductItem;
-
-CREATE TABLE public.ProductItem (
+drop table if exists public.catalog_categories;
+CREATE TABLE public.catalog_categories (
     id serial NOT NULL,
-    barcode varchar(255) NOT NULL,
-    categoryid ,
-
-
-
+    name character varying(128),
+    description character varying(256),
+    status integer,
+    parentCategoryid UUID,
     uniqueid UUID default uuid_generate_v4() primary key,
     creationdate timestamp default current_timestamp,
     lastmodified timestamp default current_timestamp
-    )
+  );
 
-product_av
-categoryassignment
-productlistprice
-productimage
 
+insert into catalog_categories (name,description,status,parentCategoryid) values ('LADIES','Main Category',1,NULL);
+
+insert into catalog_categories (name,description,status,parentCategoryid) values ('DHOTIS','Sub Category',1,(select uniqueID from catalog_categories where name='LADIES'));
+insert into catalog_categories (name,description,status,parentCategoryid) values ('PATTU','Sub Category',1,(select uniqueID from catalog_categories where name='LADIES'));
+insert into catalog_categories (name,description,status,parentCategoryid) values ('WESTERN WEAR','Sub Category',1,(select uniqueID from catalog_categories where name='LADIES'));
+insert into catalog_categories (name,description,status,parentCategoryid) values ('SAREES-LF','Sub Category',1,(select uniqueID from catalog_categories where name='LADIES'));
+insert into catalog_categories (name,description,status,parentCategoryid) values ('SAREES-VF','Sub Category',1,(select uniqueID from catalog_categories where name='LADIES'));
+insert into catalog_categories (name,description,status,parentCategoryid) values ('DRESS MATERIAL','Sub Category',1,(select uniqueID from catalog_categories where name='LADIES'));
+insert into catalog_categories (name,description,status,parentCategoryid) values ('READYMADES','Sub Category',1,(select uniqueID from catalog_categories where name='LADIES'));
+insert into catalog_categories (name,description,status,parentCategoryid) values ('BOTTOMS','Sub Category',1,(select uniqueID from catalog_categories where name='LADIES'));
+
+insert into catalog_categories (name,description,status,parentCategoryid) values ('COTTON','LEAF Category',1,(select uniqueID from catalog_categories where name='SAREES-LF'));
+insert into catalog_categories (name,description,status,parentCategoryid) values ('DUPN WVNG','LEAF Category',1,(select uniqueID from catalog_categories where name='SAREES-LF'));
+insert into catalog_categories (name,description,status,parentCategoryid) values ('WRK','LEAF Category',1,(select uniqueID from catalog_categories where name='SAREES-LF'));
+insert into catalog_categories (name,description,status,parentCategoryid) values ('SYN LR','LEAF Category',1,(select uniqueID from catalog_categories where name='SAREES-LF'));
+insert into catalog_categories (name,description,status,parentCategoryid) values ('FNC WRK','LEAF Category',1,(select uniqueID from catalog_categories where name='SAREES-LF'));
+insert into catalog_categories (name,description,status,parentCategoryid) values ('B COTN','LEAF Category',1,(select uniqueID from catalog_categories where name='SAREES-LF'));
+insert into catalog_categories (name,description,status,parentCategoryid) values ('SYN MR','LEAF Category',1,(select uniqueID from catalog_categories where name='SAREES-LF'));
+insert into catalog_categories (name,description,status,parentCategoryid) values ('SICO PRT','LEAF Category',1,(select uniqueID from catalog_categories where name='SAREES-LF'));
+insert into catalog_categories (name,description,status,parentCategoryid) values ('IK PRT','LEAF Category',1,(select uniqueID from catalog_categories where name='SAREES-LF'));
+
+
+
+drop table if exists productItem;
+
+CREATE TABLE public.productItem (
+    id serial NOT NULL,
+    barcode  character varying(28) NOT NULL,
+    typecode  character varying(28),
+    defaultimage  character varying(28), 
+    stock integer,
+    defaultcatalogcategoryid references catalog_categories(uniqueUUID),
+    status integer,
+    Title/name character varying(512),
+    costprice decimal(12,2),
+    listprice decimal(12,2),
+    UOM character varying(28),,
+    storeuuid references stores(uniqueUUID),
+    domaindatauuid references domaindata(uniqueID),
+    uniqueid UUID default uuid_generate_v4() primary key,
+    creationdate timestamp default current_timestamp,
+    lastmodified timestamp default current_timestamp
+);
+
+drop table if exists productItem_av;
+CREATE TABLE public.productItem_av (
+    ownerid UUID references productItem(uniqueID),
+    type integer,
+    name character varying(128),
+    intvalue integer,
+    stringvalue character varying(128),
+    datevalue character varying(128),
+    lastmodified timestamp default current_timestamp
+);
 
 CREATE TABLE public.productInventory
 (
     productuuid   references ProductItem(uniqueid),
-    stock number,
-    uniqueid UUID default uuid_generate_v4() primary key,
+    stockvalue integer,
     creationdate timestamp default current_timestamp,
     lastmodified timestamp default current_timestamp
 );
@@ -346,7 +413,7 @@ CREATE TABLE public.productImage
 
 
 
-
+/*
     attr_1 varchar(255) NULL,
     attr_2 varchar(255) NULL,
     attr_3 varchar(255) NULL,

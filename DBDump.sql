@@ -360,7 +360,10 @@ insert into catalog_categories (name,description,status,parentCategoryid) values
 insert into catalog_categories (name,description,status,parentCategoryid) values ('SICO PRT','LEAF Category',1,(select uniqueID from catalog_categories where name='SAREES-LF'));
 insert into catalog_categories (name,description,status,parentCategoryid) values ('IK PRT','LEAF Category',1,(select uniqueID from catalog_categories where name='SAREES-LF'));
 
-
+// Gents-> main category -> i want sub category and leaf-category
+//allcategories->
+gent-> gentrousry-> cotton
+ladies-> "saree"-> silk sare
 
 drop table if exists productItem;
 
@@ -407,6 +410,16 @@ CREATE TABLE public.productItem_av (
     lastmodified timestamp default current_timestamp
 );
 
+/*
+color, blue, product01,
+length, 42, product01,
+productvalidty, 24th-0ct-2021, product01
+
+proudct01, 0, "color", 0 "blue",null,sysdate
+product01, 1,"lenghth",42,null,null,sysdate
+product01, 2, "productvalidity",null,null, datevalue,sysdate */
+
+
 CREATE TABLE public.productInventory
 (
     productuuid   references ProductItem(uniqueid),
@@ -425,10 +438,31 @@ CREATE TABLE public.productImage
 );
 
 /*created the barcode table 01-10-2021*/
+/*when saving user will send the default uniqueUUID*/
 CREATE TABLE public.barcode
 (
 	defaultcatalogcategoryid references catalog_categories(uniqueUUID),
-    barcode Character default uuid_generate_v4() primary key,,
+    barcode Character default uuid_generate_v4() primary key,
+    attr_1 varchar(255) NULL,
+    attr_2 varchar(255) NULL,
+    attr_3 varchar(255) NULL,
+    attr_4 varchar(255) NULL,
+    attr_5 varchar(255) NULL,
+    attr_6 varchar(255) NULL,
+    attr_7 varchar(255) NULL,
+    attr_8 varchar(255) NULL,
+    attr_9 varchar(255) NULL,
+    attr_10 varchar(255) NULL,
+    attr_11 varchar(255) NULL,
+    attr_12 varchar(255) NULL,
+    attr_13 varchar(255) NULL,
+    attr_14 varchar(255) NULL,
+    attr_15 varchar(255) NULL,
+    attr_16 varchar(255) NULL,
+    attr_17 varchar(255) NULL,
+    attr_18 varchar(255) NULL,
+    attr_19 varchar(255) NULL,
+    attr_20 text NULL
     creationdate timestamp default current_timestamp,
     lastmodified timestamp default current_timestamp
 );

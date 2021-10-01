@@ -366,11 +366,10 @@ drop table if exists productItem;
 
 CREATE TABLE public.productItem (
     id serial NOT NULL,
-    barcode  character varying(28) NOT NULL,  /* need to have separate table so that population will be easier*/
+    barcode  references barcode(barcode), 
     typecode  character varying(28) 10/20,     
     defaultimage  character varying(28), 
     stock integer,
-    defaultcatalogcategoryid references catalog_categories(uniqueUUID),
     status integer,
     Title/name character varying(512),
     costprice decimal(12,2),
@@ -382,10 +381,11 @@ CREATE TABLE public.productItem (
     creationdate timestamp default current_timestamp,
     lastmodified timestamp default current_timestamp
 );
-
+/*removed the catalog_categories refrences from product table and kept in barcode table;*/
 
 1,b001,10,img001.jpg,101,def001,1,'shirt ramaraj',900,1200,'piece','s001',texttile_0001,uni001,sysdate,sysdate
 2,b001,20,img001.jpg,101,def001,1,'shirt ramaraj',900,1200,'piece','s001',texttile_0001,uni002,sysdate,sysdate
+
 
 
 productvariation
@@ -424,7 +424,14 @@ CREATE TABLE public.productImage
     lastmodified timestamp default current_timestamp
 );
 
-
+/*created the barcode table 01-10-2021*/
+CREATE TABLE public.barcode
+(
+	defaultcatalogcategoryid references catalog_categories(uniqueUUID),
+    barcode Character default uuid_generate_v4() primary key,,
+    creationdate timestamp default current_timestamp,
+    lastmodified timestamp default current_timestamp
+);
 
 /*
     attr_1 varchar(255) NULL,

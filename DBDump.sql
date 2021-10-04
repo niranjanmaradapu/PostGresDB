@@ -168,7 +168,7 @@ CREATE TABLE public.userRoleUserAssignment (
 
 */     
 
-drop table if exists deliveryslip;
+drop table if exists deliveryslip;//cart// multiple line items
 
 CREATE TABLE public.deliveryslip (
 	dsNumber character varying(28),
@@ -183,10 +183,10 @@ insert into deliveryslip(dsNumber,status,salesManID) values ('ds00001',1,(select
 insert into deliveryslip(dsNumber,status,salesManID) values ('ds00002',1,(select uniqueID from userdata where username='bhaskara'));
 insert into deliveryslip(dsNumber,status,salesManID) values ('ds00003',1,(select uniqueID from userdata where username='bhaskara'));
 
-drop table if exists lineitems;
+drop table if exists lineitems;//barcode//cartitem
 CREATE TABLE public.Lineitems (
-	dsuuid UUID references deliveryslip(uniqueID),
-	itemsku references ProductItem(uniqueID),
+	dsuuid UUID references deliveryslip(uniqueID),//foreign key
+	itemsku references ProductItem(uniqueID), /single product
 	itemprice decimal(12,2),
 	quantity integer,
 	grossvalue decimal(12,2),
@@ -212,7 +212,7 @@ drop table if exists order;
 CREATE TABLE public.order (
     orderNumber character varying(28),
     status integer,
-    dsUUID UUID references deliveryslip(uniqueID),
+    //dsUUID UUID references deliveryslip(uniqueID),//list of delivery slip
     grossvalue decimal(12,2),
     taxcode character(28),
     taxvalue decimal(12,2),
@@ -224,6 +224,14 @@ CREATE TABLE public.order (
     creationdate timestamp default current_timestamp,
     lastmodified timestamp default current_timestamp
 );
+
+//list od delivery slip
+Create table public.order_delivery{
+ uniqueID,
+ deliveryslipid,
+ orderid
+ 
+}
 
 
 drop table if exists stores;

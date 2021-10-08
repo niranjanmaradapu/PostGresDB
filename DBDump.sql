@@ -174,6 +174,7 @@ CREATE TABLE public.deliveryslip (
 	dsNumber character varying(28),
 	status integer,
 	salesManID UUID references userdata(uniqueID),
+	orderid references order(uniueID),
     uniqueID UUID default uuid_generate_v4() primary key,
     creationdate timestamp default current_timestamp,
     lastmodified timestamp default current_timestamp
@@ -197,6 +198,20 @@ CREATE TABLE public.Lineitems (
     lastmodified timestamp default current_timestamp
 );
 
+drop table if exists lineitems_re
+CREATE TABLE public.Lineitems_re (
+	itemsku references ProductItem(uniqueID), /single product
+	itemprice decimal(12,2),
+	quantity integer,
+	grossvalue decimal(12,2),
+	discount decimal(12,2),
+	netvalue decimal(12,2),
+	orderid references order(uniueID),
+    uniqueid UUID default uuid_generate_v4() primary key,
+    creationdate timestamp default current_timestamp,
+    lastmodified timestamp default current_timestamp
+);
+
 insert into lineitems(dsuuid,itemsku,itemprice,quantity,grossvalue,discount,netvalue)
 values
 ((select uniqueID from deliveryslip where dsNumber='ds00001'),'I000001',999.00,2,1998.00,0,1998.00 );
@@ -211,7 +226,7 @@ drop table if exists order;
 
 CREATE TABLE public.order (
     orderNumber character varying(28),
-    status integer,
+    status integer, 
     //dsUUID UUID references deliveryslip(uniqueID),//list of delivery slip
     grossvalue decimal(12,2),
     taxcode character(28),
@@ -225,13 +240,7 @@ CREATE TABLE public.order (
     lastmodified timestamp default current_timestamp
 );
 
-//list od delivery slip
-Create table public.order_delivery{
- uniqueID,
- deliveryslipid,
- orderid
- 
-}
+
 
 
 drop table if exists stores;
@@ -241,6 +250,14 @@ CREATE TABLE public.stores (
     uniqueid UUID default uuid_generate_v4() primary key,
     creationdate timestamp default current_timestamp,
     lastmodified timestamp default current_timestamp
+);
+
+drop table if exists public.userStoreAssignment;
+CREATE TABLE public.userStoreAssignment (
+    userUUID references userData(uniqueID),
+    storeUUID references Stores(uniqueID),
+    creationdate date default current_timestamp,
+    lastmodified date default current_timestamp
 );
 
 1. status inclusion

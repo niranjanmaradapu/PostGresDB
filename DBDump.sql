@@ -392,6 +392,17 @@ CREATE TABLE public.barcode
     attr_1 varchar(255) NULL,
     attr_2 varchar(255) NULL,
     attr_3 varchar(255) NULL,
+    attr_4 text NULL
+    creationdate timestamp default current_timestamp,
+    lastmodified timestamp default current_timestamp
+);
+
+CREATE TABLE public.barcode_textile
+(
+	barcode Character default uuid_generate_v4() primary key,
+    attr_1 varchar(255) NULL,
+    attr_2 varchar(255) NULL,
+    attr_3 varchar(255) NULL,
     attr_4 varchar(255) NULL,
     attr_5 varchar(255) NULL,
     attr_6 varchar(255) NULL,
@@ -417,27 +428,7 @@ CREATE TABLE public.barcode
 drop table if exists product_textile;
 CREATE TABLE public.product_textile (
     id serial4 NOT NULL,
-    barcode varchar(255) NOT NULL,
-    attr_1 varchar(255) NULL,
-    attr_2 varchar(255) NULL,
-    attr_3 varchar(255) NULL,
-    attr_4 varchar(255) NULL,
-    attr_5 varchar(255) NULL,
-    attr_6 varchar(255) NULL,
-    attr_7 varchar(255) NULL,
-    attr_8 varchar(255) NULL,
-    attr_9 varchar(255) NULL,
-    attr_10 varchar(255) NULL,
-    attr_11 varchar(255) NULL,
-    attr_12 varchar(255) NULL,
-    attr_13 varchar(255) NULL,
-    attr_14 varchar(255) NULL,
-    attr_15 varchar(255) NULL,
-    attr_16 varchar(255) NULL,
-    attr_17 varchar(255) NULL,
-    attr_18 varchar(255) NULL,
-    attr_19 varchar(255) NULL,
-    attr_20 text NULL,
+    barcode varchar(255) refrence Barcode_textile,
     parent_barcode varchar(255) NULL,
     cost_price numeric(15, 2) NOT NULL,
     item_mrp numeric(15, 2) NOT NULL,
